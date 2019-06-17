@@ -1,0 +1,61 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Flat HTML5/CSS3 Login Form</title>
+  
+  
+  
+      <link rel="stylesheet" href="{% static 'style.css' %}">
+
+  
+</head>
+
+<body>
+
+  <div class="login-page">
+  <div class="form" id="Signup">
+    <form class="login-form" id="OTP" onsubmit="return check()" method="post" action="{% url 'screens:details' %}">
+            {% csrf_token %}
+            {{ form }}
+      <input type="text" placeholder="Enter the OTP" class="otp" name="otp"/>
+      <div class="error"></div>
+      <button  type="submit" form="OTP" value="Submit">Verify</button>
+    </form>
+  </div>
+</div>
+  <script src='{% static "jquery.min.js" %}'></script>
+  <script>
+    function check(){
+        var number = $(".otp").val();
+          var data1 = $.ajax({
+          url: '/validate/',
+          async:false,
+          data: {
+            'otp': number
+          },
+          dataType: 'json',
+          success: function (data) {
+            return data.is_taken
+          }
+        })
+        if(data1.responseJSON.is_taken == false){
+          $(".error").css({"color":"red"}).html("<p>The OTP is not valid.</p>");
+          return false;
+        }
+        return true;
+      }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  
+
+    <script  src='{% static "index.js" %}'></script>
+
+
+
+
+</body>
+
+</html>

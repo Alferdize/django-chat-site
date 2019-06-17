@@ -1,0 +1,151 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Flat HTML5/CSS3 Login Form</title>
+  <style>
+   #note {
+    position: absolute;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fde073;
+    text-align: center;
+    line-height: 2.5;
+    overflow: hidden; 
+    -webkit-box-shadow: 0 0 5px black;
+    -moz-box-shadow:    0 0 5px black;
+    box-shadow:         0 0 5px black;
+}
+@-webkit-keyframes slideDown {
+    0%, 100% { -webkit-transform: translateY(-50px); }
+    10%, 90% { -webkit-transform: translateY(0px); }
+}
+@-moz-keyframes slideDown {
+    0%, 100% { -moz-transform: translateY(-50px); }
+    10%, 90% { -moz-transform: translateY(0px); }
+}
+.cssanimations.csstransforms #note {
+    -webkit-transform: translateY(-50px);
+    -webkit-animation: slideDown 2.5s 1.0s 1 ease forwards;
+    -moz-transform:    translateY(-50px);
+    -moz-animation:    slideDown 2.5s 1.0s 1 ease forwards;
+}
+  </style>
+  
+  
+  
+      <link rel="stylesheet" href="{% static 'style.css' %}">
+  
+</head>
+
+<body>
+  {% if message %}
+    <div id="note">
+        {{ message }}
+    </div>
+    {% endif %}
+  <div class="login-page">
+  <div class="form">
+    <form class="register-form" id="Signup" method="post" onsubmit="return check()" action="{% url 'screens:otp' %}">
+        {% if errors %}
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+      {% csrf_token %}
+      {{ form }}
+      <input type="tel" placeholder="Phone Number" class="number" name="number"/>
+      <div class="error"></div>
+      <button type="submit" class="submit" form="Signup" value="Submit">Send</button>
+      <p class="message">Already registered? <a href="#">Sign In</a></p>
+    </form>
+    <form class="login-form" id="login" method="post"  onsubmit="return login()" action="{% url 'screens:home' %}">
+        {% if errors %}
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+      {% csrf_token %}
+      {{ form }}
+      
+      <input type="text" name="username" class="username" placeholder="username"/>
+      <input type="password" name="password" class="password" placeholder="password"/>
+      <div class="errorlog"></div>
+      <button>login</button>
+      <p class="message">Not registered? <a href="#">Create an account</a></p>
+    </form>
+  </div>
+</div>
+  <script src='{% static "jquery.min.js" %}'></script>
+
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+
+    <script  src='{% static "index.js" %}'></script>
+    <script>
+      function check(){
+        var number = $(".number").val();
+        var intRegex = /^\d+$/;
+        if(intRegex.test(number) && number.length == 10) {
+          var data1 = $.ajax({
+          url: '/validate_number/',
+          async:false,
+          data: {
+            'number': number
+          },
+          dataType: 'json',
+          success: function (data) {
+            return data.is_taken
+          }
+        })
+        if(data1.responseJSON.is_taken == true){
+          $(".error").css({"color":"red"}).html("<p>The number already exists</p>")
+          return false;
+        }
+        return true;
+      }
+      else{
+        $(".error").css({"color":"red"}).html("<p>Please enter a valid number</p>")
+      }
+      }
+      function login(){
+        var username = $(".username").val();
+        var password = $(".password").val();
+          var data1 = $.ajax({
+          url: '/validate_login/',
+          async:false,
+          data: {
+            'username': username,
+            'password': password
+          },
+          dataType: 'json',
+          success: function (data) {
+            return data.is_taken
+          }
+        })
+        if(data1.responseJSON.is_taken == false){
+          $(".errorlog").css({"color":"red"}).html("<p>Please enter valid username and password</p>")
+          return false;
+        }
+        return true;
+      }
+      window.setTimeout(function() {
+    $("#note").fadeTo(500, 0).slideUp(500, function(){
+        $(this).remove(); 
+    });
+}, 4000);
+    </script>
+
+
+
+</body>
+
+</html>
